@@ -1,0 +1,37 @@
+[Unit]
+Description=elasticsearch
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+User=core
+Restart=always
+RestartSec=10
+
+ExecStartPre=-/usr/bin/docker stop elasticsearch
+ExecStartPre=-/usr/bin/docker rm elasticsearch
+ExecStartPre=-/usr/bin/docker pull itzg/elasticsearch
+
+# Setup elasticsearch data directory
+ExecStartPre=-/usr/bin/sudo /usr/bin/mkdir -p /opt/elasticsearch
+ExecStartPre=-/usr/bin/sudo /usr/bin/chmod -R 777 /opt/elasticsearch
+
+#Environment="NODE_1="
+
+#ExecStart=/bin/bash -c "/usr/bin/docker run  --name elasticsearch -e UNICAST_HOSTS=$(/usr/bin/etcdctl get /devops/elasticsearch/node/1/ip) ubuntu /bin/sh -c \"while true; do echo hello world; sleep 1; done\" "
+
+ExecStart=/bin/bash -c "/usr/bin/docker run \
+                --name elasticsearch \
+                -p 9200:9200 \
+                -p 9300:9300 \
+                -e CLUSTER=graylog2 \
+                -e UNICAST_HOSTS=$(/usr/bin/etcdctl get /devops/elasticsearch/node/1/ip):$(/usr/bin/etcdctl get /devops/elasticsearch/node/1/port),$(/usr/bin/etcdctl get /devops/elasticsearch/node/2/ip):$(/usr/bin/etcdctl get /devops/elasticsearch/node/2/port),$(/usr/bin/etcdctl get /devops/elasticsearch/node/3/ip):$(/usr/bin/etcdctl get /devops/elasticsearch/node/3/port) \
+                -e NODE_NAME=elasticsearch%i \
+                -v /opt/elasticsearch:/data \
+                itzg/elasticsearch"
+
+ExecStop=-/usr/bin/docker stop elasticsearch
+
+[X-Fleet]
+Conflicts=elasticsearch@*.service

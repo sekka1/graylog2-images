@@ -1,0 +1,15 @@
+[Unit]
+Description=elasticsearch
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+User=core
+Restart=always
+RestartSec=30
+
+ExecStart=/bin/bash -c "etcdctl set /devops/elasticsearch/node/%i/ip \"${COREOS_PRIVATE_IPV4}\" --ttl 60; etcdctl set /devops/elasticsearch/node/%i/port \"9300\" --ttl 60"
+
+[X-Fleet]
+Conflicts=set-elasticsearch@*.service
