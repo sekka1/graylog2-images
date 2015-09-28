@@ -17,10 +17,6 @@ ExecStartPre=-/usr/bin/docker pull itzg/elasticsearch
 ExecStartPre=-/usr/bin/sudo /usr/bin/mkdir -p /opt/elasticsearch
 ExecStartPre=-/usr/bin/sudo /usr/bin/chmod -R 777 /opt/elasticsearch
 
-#Environment="NODE_1="
-
-#ExecStart=/bin/bash -c "/usr/bin/docker run  --name elasticsearch -e UNICAST_HOSTS=$(/usr/bin/etcdctl get /devops/elasticsearch/node/1/ip) ubuntu /bin/sh -c \"while true; do echo hello world; sleep 1; done\" "
-
 ExecStart=/bin/bash -c "/usr/bin/docker run \
                 --name elasticsearch \
                 -p 9200:9200 \
