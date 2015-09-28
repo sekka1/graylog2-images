@@ -118,11 +118,11 @@ Start the Elasticsearch units
 
     fleetctl start elasticsearch@{1..3}.service
     
+Start the Graylog server
 
-
-
-
-
+    fleetctl start graylog-server.service
+    
+    
 
 
 

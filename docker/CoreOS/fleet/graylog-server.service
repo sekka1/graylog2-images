@@ -1,0 +1,42 @@
+[Unit]
+Description=graylog-server
+After=docker.service
+
+[Service]
+EnvironmentFile=/etc/environment
+TimeoutStartSec=0
+User=core
+Restart=always
+RestartSec=10
+
+ExecStartPre=-/usr/bin/docker stop graylog-server
+ExecStartPre=-/usr/bin/docker rm graylog-server
+ExecStartPre=-/usr/bin/docker pull graylog2/allinone
+
+# Setup graylog-server data directory
+ExecStartPre=-/usr/bin/sudo /usr/bin/mkdir -p /opt/graylog/data
+ExecStartPre=-/usr/bin/sudo /usr/bin/mkdir -p /opt/graylog/logs
+ExecStartPre=-/usr/bin/sudo /usr/bin/mkdir -p /opt/graylog/plugins
+ExecStartPre=-/usr/bin/sudo /usr/bin/chmod -R 777 /opt/graylog
+
+ExecStart=/usr/bin/docker run \
+                --name graylog-server \
+                -p 12900:12900 \
+                -p 12201:12201 \
+                -p 12201:12201/udp \
+                -p 9000:9000 \
+                -p 443:443 \
+                -e GRAYLOG_NODE_ID=de305d54-75b4-431b-adb2-eb6b9e83743 \
+                -e GRAYLOG_SERVER_SECRET=somesecretsaltstring \
+                -e GRAYLOG_TIMEZONE=America/Los_Angeles \
+                -e GRAYLOG_PASSWORD=SeCuRePwD \
+                -e GRAYLOG_USERNAME=admin \
+                -v /opt/graylog/data:/var/opt/graylog/data \
+                -v /opt/graylog/logs:/var/log/graylog \
+                -v /opt/graylog/plugins:/opt/graylog/plugin \
+                graylog2/allinone
+
+ExecStop=-/usr/bin/docker stop graylog-server
+
+[X-Fleet]
+Conflicts=graylog-server@*.service
