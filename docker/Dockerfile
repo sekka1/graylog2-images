@@ -15,6 +15,8 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /tmp/* /var/tmp/*
 
+ADD default-attribute.rb /opt/graylog/embedded/cookbooks/graylog/attributes/default.rb
+
 VOLUME /var/opt/graylog/data
 VOLUME /var/log/graylog
 VOLUME /opt/graylog/plugin
